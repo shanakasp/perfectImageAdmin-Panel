@@ -63,6 +63,9 @@ const BlogView = () => {
     }
   };
 
+  // Clean up link data by removing extra quotes
+  const cleanLink = (link) => link.replace(/^"|"$/g, "");
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">Error fetching data</Typography>;
 
@@ -93,8 +96,12 @@ const BlogView = () => {
           {renderGridItem("Description", blogData.desc)}
           {renderGridItem(
             "Link",
-            <a href={blogData.link} target="_blank" rel="noopener noreferrer">
-              {blogData.link}
+            <a
+              href={cleanLink(blogData.link)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {cleanLink(blogData.link)}
             </a>
           )}
           {renderGridItem("Keywords", formatKeywords(blogData.keywords))}
