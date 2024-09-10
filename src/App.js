@@ -6,7 +6,13 @@ import Approved from "./scenes/approved/index.jsx";
 import Changepw from "./scenes/auth/changepw/index.jsx";
 import Signup from "./scenes/auth/signup/Signup.jsx";
 import AddBlog from "./scenes/blogs/AddBlogs.jsx";
+import EditBlog from "./scenes/blogs/EditBlogs.jsx";
 import ViewPending from "./scenes/blogs/View.jsx";
+import AddMovie from "./scenes/movies/AddMovies.jsx";
+import EditMovie from "./scenes/movies/EditMovies.jsx";
+import ViewMovie from "./scenes/movies/View.jsx";
+import Movie from "./scenes/movies/index.jsx";
+
 import Pending from "./scenes/blogs/index.jsx";
 import Dashboard from "./scenes/dashboard";
 import Sidebar from "./scenes/global/Sidebar";
@@ -33,12 +39,16 @@ function App() {
                 <Route path="/dd" element={<Dashboard />} />
 
                 <Route path="/blog" element={<Pending />} />
-
                 <Route path="/blog/add" element={<AddBlog />} />
+                <Route path="/blog/view/:id" element={<ViewPending />} />
+                <Route path="/blog/edit/:id" element={<EditBlog />} />
+
+                <Route path="/movie" element={<Movie />} />
+                <Route path="/movie/add" element={<AddMovie />} />
+                <Route path="/movie/view/:id" element={<ViewMovie />} />
+                <Route path="/movie/edit/:id" element={<EditMovie />} />
 
                 <Route path="/approved" element={<Approved />} />
-
-                <Route path="/blog/view/:id" element={<ViewPending />} />
 
                 <Route
                   path="/casting/approved/view/:id"

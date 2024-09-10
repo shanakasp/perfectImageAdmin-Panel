@@ -160,14 +160,14 @@ const FormsUser = () => {
       renderCell: (params) => (
         <Box display="flex">
           <Tooltip title="View">
-            <Link to={`/blog/view/${params.row.id}`}>
+            <Link to={`/movie/view/${params.row.id}`}>
               <IconButton>
                 <VisibilityIcon />
               </IconButton>
             </Link>
           </Tooltip>
           <Tooltip title="Edit">
-            <Link to={`/blog/edit/${params.row.id}`}>
+            <Link to={`/movie/edit/${params.row.id}`}>
               <IconButton>
                 <EditIcon />
               </IconButton>
@@ -186,7 +186,7 @@ const FormsUser = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Blogs" subtitle="List of all blogs" />
+        <Header title="Movies" subtitle="List of all movies" />
         <Button
           variant="contained"
           color="secondary"
@@ -198,9 +198,9 @@ const FormsUser = () => {
               backgroundColor: "#3e4396",
             },
           }}
-          onClick={() => navigate("/blog/add")}
+          onClick={() => navigate("/movie/add")}
         >
-          Add Blogs
+          Add Movies
         </Button>
       </Box>
       <Box

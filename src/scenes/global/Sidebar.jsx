@@ -131,8 +131,8 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Approved Castings"
-              to="/approved"
+              title="Movies Log"
+              to="/movie"
               icon={<GroupAddOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
