@@ -24,7 +24,11 @@ const BlogView = () => {
         const response = await axios.get(
           `https://admin.pfimage.hasthiya.org/movie/getById/${id}`
         );
-        setBlogData(response.data.data);
+        if (response.data.status) {
+          setBlogData(response.data.data);
+        } else {
+          throw new Error(response.data.message);
+        }
         setLoading(false);
       } catch (err) {
         setError(err);
@@ -48,6 +52,15 @@ const BlogView = () => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const formatKeywords = (keywords) => {
+    try {
+      const parsedKeywords = JSON.parse(keywords);
+      return parsedKeywords.join(", ");
+    } catch (e) {
+      return "Invalid keywords format";
+    }
   };
 
   if (loading) return <CircularProgress />;
@@ -76,8 +89,15 @@ const BlogView = () => {
       {blogData && (
         <Grid container spacing={2}>
           {renderGridItem("ID", blogData.id)}
-          {renderGridItem("Topic", blogData.title)}
+          {renderGridItem("Title", blogData.title)}
           {renderGridItem("Description", blogData.desc)}
+          {renderGridItem(
+            "Link",
+            <a href={blogData.link} target="_blank" rel="noopener noreferrer">
+              {blogData.link}
+            </a>
+          )}
+          {renderGridItem("Keywords", formatKeywords(blogData.keywords))}
           {renderGridItem("Created At", formatDate(blogData.createdAt))}
           {renderGridItem("Updated At", formatDate(blogData.updatedAt))}
 
