@@ -1,15 +1,18 @@
+import AddIcon from "@mui/icons-material/Add";
 import ImageIcon from "@mui/icons-material/Image";
+import RemoveIcon from "@mui/icons-material/Remove";
 import {
   Alert,
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Formik } from "formik";
+import { FieldArray, Formik } from "formik";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
@@ -41,14 +44,16 @@ const Form = () => {
   const handleFormSubmit = async (values, { resetForm }) => {
     try {
       const formData = new FormData();
-      formData.append("topic", values.topic);
-      formData.append("description", values.description);
-      formData.append("imageURL", values.imageURL); // Send image file here
+      formData.append("title", values.title);
+      formData.append("link", values.link);
+      formData.append("desc", values.desc);
+      formData.append("imageURL", values.imageURL);
+      formData.append("keywords", JSON.stringify(values.keywords));
 
       const token = localStorage.getItem("accessToken");
 
       const response = await fetch(
-        "https://admin.pfimage.hasthiya.org/blog/create",
+        "https://admin.pfimage.hasthiya.org/movie/create",
         {
           method: "POST",
           body: formData,
@@ -60,26 +65,26 @@ const Form = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        console.log("Blog created successfully:", responseData);
-        setSnackbarMessage("Blog created successfully!");
+        console.log("Movie created successfully:", responseData);
+        setSnackbarMessage("Movie created successfully!");
         setSnackbarSeverity("success");
         setSnackbarOpen(true);
 
         setPreviewImage(null);
         resetForm();
         setTimeout(() => {
-          navigate("/blog");
-        }, 3000);
+          navigate("/movie");
+        }, 2000);
       } else {
         const errorData = await response.json();
-        console.error("Error creating blog:", errorData);
-        setSnackbarMessage("Error creating blog: " + errorData.message);
+        console.error("Error creating movie:", errorData);
+        setSnackbarMessage("Error creating movie: " + errorData.message);
         setSnackbarSeverity("error");
         setSnackbarOpen(true);
       }
     } catch (error) {
-      console.error("Error creating blog:", error);
-      setSnackbarMessage("Error creating blog: " + error.message);
+      console.error("Error creating movie:", error);
+      setSnackbarMessage("Error creating movie: " + error.message);
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
@@ -91,13 +96,15 @@ const Form = () => {
 
   return (
     <Box m="20px" height="80vh" overflow="auto" paddingRight="20px">
-      <Header title="CREATE NEW BLOG" subtitle="Create a blog post" />
+      <Header title="CREATE NEW MOVIE" subtitle="Add a new movie" />
 
       <Formik
         initialValues={{
-          topic: "",
-          description: "",
+          title: "",
+          link: "",
+          desc: "",
           imageURL: null,
+          keywords: [""], // Initialize with one empty keyword field
         }}
         validationSchema={checkoutSchema}
         onSubmit={handleFormSubmit}
@@ -123,15 +130,26 @@ const Form = () => {
             >
               <TextField
                 fullWidth
-                multiline
                 variant="filled"
-                label="Topic"
-                name="topic"
-                value={values.topic}
+                label="Title"
+                name="title"
+                value={values.title}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={!!touched.topic && !!errors.topic}
-                helperText={touched.topic && errors.topic}
+                error={!!touched.title && !!errors.title}
+                helperText={touched.title && errors.title}
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                label="Link"
+                name="link"
+                value={values.link}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.link && !!errors.link}
+                helperText={touched.link && errors.link}
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
@@ -140,14 +158,62 @@ const Form = () => {
                 variant="filled"
                 rows={6}
                 label="Description"
-                name="description"
-                value={values.description}
+                name="desc"
+                value={values.desc}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={!!touched.description && !!errors.description}
-                helperText={touched.description && errors.description}
+                error={!!touched.desc && !!errors.desc}
+                helperText={touched.desc && errors.desc}
                 sx={{ gridColumn: "span 4" }}
               />
+              <FieldArray
+                name="keywords"
+                render={(arrayHelpers) => (
+                  <Box sx={{ gridColumn: "span 4" }}>
+                    {values.keywords.map((keyword, index) => (
+                      <Box
+                        key={index}
+                        display="flex"
+                        alignItems="center"
+                        mb="10px"
+                      >
+                        <TextField
+                          fullWidth
+                          variant="filled"
+                          name={`keywords.${index}`}
+                          value={keyword}
+                          onChange={handleChange}
+                          label="Keyword"
+                          onBlur={handleBlur}
+                          error={
+                            !!touched.keywords && !!errors.keywords?.[index]
+                          }
+                          helperText={
+                            touched.keywords && errors.keywords?.[index]
+                          }
+                          sx={{ marginRight: "10px" }}
+                        />
+                        <IconButton
+                          color="secondary"
+                          onClick={() => arrayHelpers.remove(index)}
+                        >
+                          <RemoveIcon />
+                        </IconButton>
+                      </Box>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<AddIcon />}
+                      onClick={() => arrayHelpers.push("")}
+                    >
+                      Add New Keyword
+                    </Button>
+                  </Box>
+                )}
+              />
+
               <Box sx={{ gridColumn: "span 2" }}>
                 <label htmlFor="image-upload">
                   <input
@@ -165,7 +231,7 @@ const Form = () => {
                     color="secondary"
                     startIcon={<ImageIcon />}
                   >
-                    Select Blog Image
+                    Select Movie Image
                   </Button>
                 </label>
 
@@ -198,7 +264,7 @@ const Form = () => {
                 disabled={isSubmitting}
                 startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
               >
-                <strong>Create New Blog</strong>
+                <strong>Create New Movie</strong>
               </Button>
             </Box>
           </form>
@@ -225,9 +291,11 @@ const Form = () => {
 };
 
 const checkoutSchema = yup.object().shape({
-  topic: yup.string().required("Topic is required"),
-  description: yup.string().required("Description is required"),
+  title: yup.string().required("Title is required"),
+  link: yup.string().url("Must be a valid URL").required("Link is required"),
+  desc: yup.string().required("Description is required"),
   imageURL: yup.mixed().required("Image is required"),
+  keywords: yup.array().of(yup.string().required("Keyword is required")),
 });
 
 export default Form;

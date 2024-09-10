@@ -21,11 +21,10 @@ const FormsUser = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "https://admin.pfimage.hasthiya.org/blog/getAll",
+        "https://admin.pfimage.hasthiya.org/movie/getAll",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -36,18 +35,24 @@ const FormsUser = () => {
         throw new Error(`Failed to fetch data: ${response.statusText}`);
       }
       const responseData = await response.json();
-      if (!Array.isArray(responseData.BlogData.data)) {
-        throw new Error("Response data is not an array");
+      if (
+        !responseData.moviesData ||
+        !Array.isArray(responseData.moviesData.data)
+      ) {
+        throw new Error("Response data is not in the expected format");
       }
-      const mappedData = responseData.BlogData.data
-        .map((item) => ({
-          id: item.id,
-          topic: item.topic,
-          description: item.description,
-          imageURL: item.imageURL,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-        }))
+      const mappedData = responseData.moviesData.data
+        .map((item) => {
+          return {
+            id: item.id,
+            title: item.title,
+            description: item.desc,
+            imageURL: item.imageURL,
+            keywords: item.keywords,
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
+          };
+        })
         .sort((a, b) => b.id - a.id);
 
       setData(mappedData);
@@ -59,7 +64,7 @@ const FormsUser = () => {
   const handleDeleteClick = async (id) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this blog!",
+      text: "Once deleted, you will not be able to recover this movie!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -69,7 +74,7 @@ const FormsUser = () => {
       if (result.isConfirmed) {
         try {
           const response = await fetch(
-            `https://admin.pfimage.hasthiya.org/blog/delete/${id}`,
+            `https://admin.pfimage.hasthiya.org/movie/delete/${id}`,
             {
               method: "DELETE",
               headers: {
@@ -78,14 +83,14 @@ const FormsUser = () => {
             }
           );
           if (!response.ok) {
-            throw new Error("Failed to delete blog");
+            throw new Error("Failed to delete movie");
           }
           const updatedData = data.filter((item) => item.id !== id);
           setData(updatedData);
-          Swal.fire("Deleted!", "The blog has been deleted.", "success");
+          Swal.fire("Deleted!", "The movie has been deleted.", "success");
         } catch (error) {
-          console.error("Error deleting blog:", error);
-          Swal.fire("Error!", "Failed to delete blog.", "error");
+          console.error("Error deleting movie:", error);
+          Swal.fire("Error!", "Failed to delete movie.", "error");
         }
       }
     });
@@ -99,8 +104,8 @@ const FormsUser = () => {
       sortable: true,
     },
     {
-      field: "topic",
-      headerName: "Topic",
+      field: "title",
+      headerName: "Title",
       flex: 1,
       sortable: true,
     },
@@ -111,13 +116,30 @@ const FormsUser = () => {
       sortable: true,
     },
     {
+      field: "keywords",
+      headerName: "Keywords",
+      flex: 1,
+      sortable: true,
+      renderCell: (params) => {
+        const cleanedKeywords = params.value
+          .map((keyword) =>
+            keyword
+              .replace(/^\["|"\]$/g, "")
+              .replace(/^"|"$/g, "")
+              .trim()
+          )
+          .join(", ");
+        return <span>{cleanedKeywords}</span>;
+      },
+    },
+    {
       field: "imageURL",
       headerName: "Image",
       flex: 1,
       renderCell: (params) => (
         <img
           src={params.value}
-          alt="Blog"
+          alt="Movie"
           style={{
             width: 50,
             height: 50,
@@ -130,7 +152,7 @@ const FormsUser = () => {
     {
       field: "createdAt",
       headerName: "Created At",
-      flex: 1,
+      flex: 0.7,
       renderCell: (params) => {
         const date = new Date(params.row.createdAt);
         const day = date.getDate().toString().padStart(2, "0");
@@ -140,23 +162,11 @@ const FormsUser = () => {
         return <span>{formattedDate}</span>;
       },
     },
-    {
-      field: "updatedAt",
-      headerName: "Updated At",
-      flex: 1,
-      renderCell: (params) => {
-        const date = new Date(params.row.updatedAt);
-        const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const year = date.getFullYear();
-        const formattedDate = `${day}/${month}/${year}`;
-        return <span>{formattedDate}</span>;
-      },
-    },
+
     {
       field: "Actions",
       headerName: "Actions",
-      width: 120,
+      width: 130,
       renderCell: (params) => (
         <Box display="flex">
           <Tooltip title="View">

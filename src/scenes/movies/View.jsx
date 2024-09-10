@@ -22,7 +22,7 @@ const BlogView = () => {
     const fetchBlogData = async () => {
       try {
         const response = await axios.get(
-          `https://admin.pfimage.hasthiya.org/blog/getById/${id}`
+          `https://admin.pfimage.hasthiya.org/movie/getById/${id}`
         );
         setBlogData(response.data.data);
         setLoading(false);
@@ -76,8 +76,8 @@ const BlogView = () => {
       {blogData && (
         <Grid container spacing={2}>
           {renderGridItem("ID", blogData.id)}
-          {renderGridItem("Topic", blogData.topic)}
-          {renderGridItem("Description", blogData.description)}
+          {renderGridItem("Topic", blogData.title)}
+          {renderGridItem("Description", blogData.desc)}
           {renderGridItem("Created At", formatDate(blogData.createdAt))}
           {renderGridItem("Updated At", formatDate(blogData.updatedAt))}
 

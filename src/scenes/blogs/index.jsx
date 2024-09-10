@@ -156,7 +156,7 @@ const FormsUser = () => {
     {
       field: "Actions",
       headerName: "Actions",
-      width: 120,
+      width: 130,
       renderCell: (params) => (
         <Box display="flex">
           <Tooltip title="View">
